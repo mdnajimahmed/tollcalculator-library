@@ -9,35 +9,35 @@ public class TollService {
   private final FeeService feeService = new FeeService();
   private final HolidayService holidayService = new HolidayService();
 
-  public double calculate(final List<LocalDateTime> passes) {
+  public double calculateTotalToll(final List<LocalDateTime> passes) {
     return passes
         .stream()
         .sorted()
         .collect(Collectors.groupingBy(LocalDateTime::toLocalDate))
         .values()
         .stream()
-        .map(this::calculateTollForSameDayPasses)
+        .map(this::calculateTollForDay)
         .mapToDouble(Double::doubleValue)
         .sum();
   }
 
-  private double calculateTollForSameDayPasses(final List<LocalDateTime> passes) {
-    if (holidayService.isHoliday(passes.get(0).toLocalDate())) {
+  private double calculateTollForDay(final List<LocalDateTime> dailyPasses) {
+    if (holidayService.isHoliday(dailyPasses.get(0).toLocalDate())) {
       return 0;
     }
-    final double totalBilled = passes.stream()
+    final double totalBilled = dailyPasses.stream()
         .collect(Collectors.groupingBy(dt ->
             dt.withMinute(0).withSecond(0).withNano(0)))
         .values()
         .stream()
-        .map(this::calculateTollForHourPasses)
+        .map(this::calculateTollForHour)
         .mapToDouble(Double::doubleValue)
         .sum();
     return Math.min(totalBilled, MAXIMUM_FEE_PER_DAY);
 
   }
 
-  private double calculateTollForHourPasses(final List<LocalDateTime> localDateTimes) {
-    return localDateTimes.stream().map(feeService::getTollRate).max(Double::compare).orElse(0.0);
+  private double calculateTollForHour(final List<LocalDateTime> hourlyPasses) {
+    return hourlyPasses.stream().map(feeService::getTollRate).max(Double::compare).orElse(0.0);
   }
 }
