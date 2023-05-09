@@ -9,9 +9,13 @@ public class TollCalculator {
   private final TollService tollService = new TollService();
 
   public int getTollFee(Vehicle vehicle, Date... dates) {
-    return (int) tollService.calculateTollForPasses(vehicle, Arrays.stream(dates)
+    return (int) tollService.calculateTollForPasses(vehicle, convertDates(dates));
+  }
+
+  private List<LocalDateTime> convertDates(Date[] dates) {
+    return Arrays.stream(dates)
         .map(date -> LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()))
-        .collect(Collectors.toList()));
+        .collect(Collectors.toList());
   }
 
   public static void main(String[] args) {

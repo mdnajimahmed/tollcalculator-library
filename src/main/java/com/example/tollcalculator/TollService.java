@@ -66,7 +66,7 @@ public class TollService {
   }
 
   private boolean isTollFree(Vehicle vehicle, List<LocalDateTime> passTimestamps) {
-    return passTimestamps.isEmpty() || vehicle.isTollFree() ||
+    return vehicle.isTollFree() || passTimestamps.isEmpty() ||
         isTollFreeDay(passTimestamps.get(0).toLocalDate());
   }
 
