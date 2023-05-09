@@ -1,43 +1,87 @@
 package com.example.tollcalculator;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 public class TollService {
+  private static final int MINIMUM_MINUTE_BETWEEN_CHARGES = 60;
+
   public static final int MAXIMUM_FEE_PER_DAY = 60;
+
   private final FeeService feeService = new FeeService();
+
   private final HolidayService holidayService = new HolidayService();
 
-  public double calculateTotalToll(final List<LocalDateTime> passes) {
-    return passes
-        .stream()
-        .sorted()
-        .collect(Collectors.groupingBy(LocalDateTime::toLocalDate))
-        .values()
-        .stream()
-        .map(this::calculateTollForDay)
-        .mapToDouble(Double::doubleValue)
-        .sum();
-  }
-
-  private double calculateTollForDay(final List<LocalDateTime> dailyPasses) {
-    if (holidayService.isHoliday(dailyPasses.get(0).toLocalDate())) {
-      return 0;
+  public double calculateTollForPasses(final Vehicle vehicle,
+                                       final List<LocalDateTime> passTimestamps) {
+    if (isTollFree(vehicle, passTimestamps)) {
+      return 0.0;
     }
-    final double totalBilled = dailyPasses.stream()
-        .collect(Collectors.groupingBy(dt ->
-            dt.withMinute(0).withSecond(0).withNano(0)))
-        .values()
-        .stream()
-        .map(this::calculateTollForHour)
-        .mapToDouble(Double::doubleValue)
-        .sum();
-    return Math.min(totalBilled, MAXIMUM_FEE_PER_DAY);
-
+    final List<List<LocalDateTime>> hourlyWindows = getHourlyWindows(passTimestamps);
+    double totalToll = 0;
+    for (final List<LocalDateTime> hourlyWindow : hourlyWindows) {
+      final double maximumHourlyFee = getMaxHourlyFee(hourlyWindow);
+      totalToll += maximumHourlyFee;
+      if (totalToll >= MAXIMUM_FEE_PER_DAY) {
+        return MAXIMUM_FEE_PER_DAY;
+      }
+    }
+    return totalToll;
   }
 
-  private double calculateTollForHour(final List<LocalDateTime> hourlyPasses) {
-    return hourlyPasses.stream().map(feeService::getTollRate).max(Double::compare).orElse(0.0);
+  private List<List<LocalDateTime>> getHourlyWindows(final List<LocalDateTime> passTimestamps) {
+    final List<List<LocalDateTime>> hourlyWindows = new ArrayList<>();
+    List<LocalDateTime> currentHourlyWindow = new ArrayList<>();
+
+    for (final LocalDateTime passTimestamp : passTimestamps) {
+      if (currentHourlyWindow.isEmpty() ||
+          isWithinHourlyWindow(currentHourlyWindow.get(0), passTimestamp)) {
+        currentHourlyWindow.add(passTimestamp);
+      } else {
+        hourlyWindows.add(currentHourlyWindow);
+        currentHourlyWindow = new ArrayList<>();
+        currentHourlyWindow.add(passTimestamp);
+      }
+    }
+
+    if (!currentHourlyWindow.isEmpty()) {
+      hourlyWindows.add(currentHourlyWindow);
+    }
+
+    return hourlyWindows;
   }
+
+  private double getMaxHourlyFee(final List<LocalDateTime> hourlyWindow) {
+    return hourlyWindow.stream()
+        .map(LocalDateTime::toLocalTime)
+        .mapToDouble(feeService::getTollRate)
+        .max()
+        .orElse(0.0);
+  }
+
+  private boolean isTollFree(Vehicle vehicle, List<LocalDateTime> passTimestamps) {
+    return passTimestamps.isEmpty() || vehicle.isTollFree() ||
+        isTollFreeDay(passTimestamps.get(0).toLocalDate());
+  }
+
+
+  private boolean isWithinHourlyWindow(final LocalDateTime start, final LocalDateTime end) {
+    return ChronoUnit.MINUTES.between(start, end) <= MINIMUM_MINUTE_BETWEEN_CHARGES;
+  }
+
+  private boolean isTollFreeDay(final LocalDate date) {
+    return isWeekend(date) || holidayService.isHoliday(date);
+  }
+
+  private boolean isWeekend(final LocalDate toLocalDate) {
+    return toLocalDate.getDayOfWeek() == DayOfWeek.SATURDAY ||
+        toLocalDate.getDayOfWeek() == DayOfWeek.SUNDAY;
+  }
+
 }
