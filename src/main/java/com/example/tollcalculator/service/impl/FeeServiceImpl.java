@@ -80,15 +80,15 @@ The start time of the time period for which the toll rate applies.
       this.fee = fee;
     }
 
-    public LocalTime getHourStart() {
+    LocalTime getHourStart() {
       return hourStart;
     }
 
-    public LocalTime getHourEnd() {
+    LocalTime getHourEnd() {
       return hourEnd;
     }
 
-    public double getFee() {
+    double getFee() {
       return fee;
     }
 
