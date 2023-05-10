@@ -1,10 +1,9 @@
-package com.example.tollcalculator;
+package com.example.tollcalculator.service.impl;
 
 import com.example.tollcalculator.domain.ForeignServiceVehicle;
 import com.example.tollcalculator.domain.PrivateCar;
 import com.example.tollcalculator.domain.Vehicle;
 import com.example.tollcalculator.service.TollService;
-import com.example.tollcalculator.service.impl.TollServiceImpl;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -21,7 +20,7 @@ class TollServiceTest {
   void testCalculateTollForPassesOnTollFreeVehicle() {
     Vehicle privateCar = new ForeignServiceVehicle();
     List<LocalDateTime> passes = Arrays.asList(LocalDateTime.of(2023, 05, 10, 7, 18, 45));
-    final double fee = tollService.calculateTollForPasses(privateCar, passes);
+    final double fee = tollService.calculateTollForPassesOfSameDay(privateCar, passes);
     Assertions.assertEquals(0, fee, EPS);
   }
 
@@ -29,7 +28,7 @@ class TollServiceTest {
   void testCalculateTollForPassesOnTollableVehicle() {
     Vehicle privateCar = new PrivateCar();
     List<LocalDateTime> passes = Arrays.asList(LocalDateTime.of(2023, 05, 10, 7, 18, 45));
-    final double fee = tollService.calculateTollForPasses(privateCar, passes);
+    final double fee = tollService.calculateTollForPassesOfSameDay(privateCar, passes);
     Assertions.assertEquals(18.0, fee, EPS);
   }
 
@@ -37,7 +36,7 @@ class TollServiceTest {
   void testCalculateTollForPassesOnSaturday() {
     Vehicle privateCar = new PrivateCar();
     List<LocalDateTime> passes = Arrays.asList(LocalDateTime.of(2023, 05, 6, 7, 18, 45));
-    final double fee = tollService.calculateTollForPasses(privateCar, passes);
+    final double fee = tollService.calculateTollForPassesOfSameDay(privateCar, passes);
     Assertions.assertEquals(0.0, fee, EPS);
   }
 
@@ -45,7 +44,7 @@ class TollServiceTest {
   void testCalculateTollForPassesOnSunday() {
     Vehicle privateCar = new PrivateCar();
     List<LocalDateTime> passes = Arrays.asList(LocalDateTime.of(2023, 05, 7, 7, 18, 45));
-    final double fee = tollService.calculateTollForPasses(privateCar, passes);
+    final double fee = tollService.calculateTollForPassesOfSameDay(privateCar, passes);
     Assertions.assertEquals(0.0, fee, EPS);
   }
 
@@ -54,7 +53,7 @@ class TollServiceTest {
   void testCalculateTollForPassesOnHoliday() {
     Vehicle privateCar = new PrivateCar();
     List<LocalDateTime> passes = Arrays.asList(LocalDateTime.of(2023, 05, 1, 7, 18, 45));
-    final double fee = tollService.calculateTollForPasses(privateCar, passes);
+    final double fee = tollService.calculateTollForPassesOfSameDay(privateCar, passes);
     Assertions.assertEquals(0.0, fee, EPS);
   }
 
@@ -62,7 +61,7 @@ class TollServiceTest {
   void testCalculateTollForPassesOnTollableVehicleMissingFeeEntry() {
     Vehicle privateCar = new PrivateCar();
     List<LocalDateTime> passes = Arrays.asList(LocalDateTime.of(2023, 05, 10, 3, 18, 45));
-    final double fee = tollService.calculateTollForPasses(privateCar, passes);
+    final double fee = tollService.calculateTollForPassesOfSameDay(privateCar, passes);
     Assertions.assertEquals(0, fee, EPS);
   }
 
@@ -74,7 +73,7 @@ class TollServiceTest {
         LocalDateTime.of(2023, 05, 10, 16, 15, 0) // 18
     );
     // max(13,18) = 18 is expected result for the same hour period.
-    final double fee = tollService.calculateTollForPasses(privateCar, passes);
+    final double fee = tollService.calculateTollForPassesOfSameDay(privateCar, passes);
     Assertions.assertEquals(18.0, fee, EPS);
   }
 
@@ -101,7 +100,7 @@ class TollServiceTest {
         LocalDateTime.of(2023, 05, 10, 10, 15, 0) // 8
 
     );
-    final double fee = tollService.calculateTollForPasses(privateCar, passes);
+    final double fee = tollService.calculateTollForPassesOfSameDay(privateCar, passes);
     Assertions.assertEquals(44.0, fee, EPS);
   }
 
@@ -133,7 +132,7 @@ class TollServiceTest {
         LocalDateTime.of(2023, 05, 10, 16, 15, 0) // 18
 
     );
-    final double fee = tollService.calculateTollForPasses(privateCar, passes);
+    final double fee = tollService.calculateTollForPassesOfSameDay(privateCar, passes);
     Assertions.assertEquals(60.0, fee, EPS);
   }
 
@@ -176,7 +175,7 @@ class TollServiceTest {
 
         LocalDateTime.of(2023, 05, 10, 19, 45, 0)// 0
     );
-    final double fee = tollService.calculateTollForPasses(privateCar, passes);
+    final double fee = tollService.calculateTollForPassesOfSameDay(privateCar, passes);
     Assertions.assertEquals(60.0, fee, EPS);
   }
 

@@ -4,9 +4,19 @@ import com.example.tollcalculator.service.HolidayService;
 import java.time.LocalDate;
 import java.util.Map;
 
+/**
+ * This class provides a holiday service that checks if a given date is a holiday.
+ */
 public class HolidayServiceImpl implements HolidayService {
+  /**
+   * A map that contains the holidays as key-value pairs, where the key is the date and the value is the name of the holiday.
+   */
   private final Map<LocalDate, String> holidays;
 
+  /**
+   * Constructs a new {@code HolidayServiceImpl} object and initializes the {@code holidays}
+   * map with a set of predefined holidays.
+   */
   public HolidayServiceImpl() {
     holidays = Map.ofEntries(
         Map.entry(LocalDate.of(2023, 1, 1), "New Year's Day"),
@@ -26,6 +36,12 @@ public class HolidayServiceImpl implements HolidayService {
     );
   }
 
+  /**
+   * Checks if a given date is a holiday.
+   *
+   * @param date the date to check
+   * @return true if the given date is a holiday, false otherwise
+   */
   public boolean isHoliday(final LocalDate date) {
     return holidays.containsKey(date);
   }
