@@ -1,12 +1,13 @@
-package com.example.tollcalculator;
+package com.example.tollcalculator.service.impl;
 
+import com.example.tollcalculator.service.HolidayService;
 import java.time.LocalDate;
 import java.util.Map;
 
-public class HolidayService {
+public class HolidayServiceImpl implements HolidayService {
   private final Map<LocalDate, String> holidays;
 
-  public HolidayService() {
+  public HolidayServiceImpl() {
     holidays = Map.ofEntries(
         Map.entry(LocalDate.of(2023, 1, 1), "New Year's Day"),
         Map.entry(LocalDate.of(2023, 1, 6), "Epiphany"),

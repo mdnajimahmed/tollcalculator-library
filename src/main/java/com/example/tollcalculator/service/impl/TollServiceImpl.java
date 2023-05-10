@@ -1,23 +1,29 @@
-package com.example.tollcalculator;
+package com.example.tollcalculator.service.impl;
 
+import com.example.tollcalculator.domain.Vehicle;
+import com.example.tollcalculator.service.FeeService;
+import com.example.tollcalculator.service.HolidayService;
+import com.example.tollcalculator.service.TollService;
+import com.example.tollcalculator.service.impl.FeeServiceImpl;
+import com.example.tollcalculator.service.impl.HolidayServiceImpl;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 
-public class TollService {
+public class TollServiceImpl implements TollService {
   private static final int MINIMUM_MINUTE_BETWEEN_CHARGES = 60;
 
   public static final int MAXIMUM_FEE_PER_DAY = 60;
 
-  private final FeeService feeService = new FeeService();
+  private final FeeService feeService = new FeeServiceImpl();
 
-  private final HolidayService holidayService = new HolidayService();
+  private final HolidayService holidayService = new HolidayServiceImpl();
 
+  @Override
   public double calculateTollForPasses(final Vehicle vehicle,
                                        final List<LocalDateTime> passTimestamps) {
     if (isTollFree(vehicle, passTimestamps)) {
@@ -65,7 +71,7 @@ public class TollService {
         .orElse(0.0);
   }
 
-  private boolean isTollFree(Vehicle vehicle, List<LocalDateTime> passTimestamps) {
+  private boolean isTollFree(final Vehicle vehicle, final List<LocalDateTime> passTimestamps) {
     return vehicle.isTollFree() || passTimestamps.isEmpty() ||
         isTollFreeDay(passTimestamps.get(0).toLocalDate());
   }
