@@ -4,17 +4,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.tollcalculator.domain.PrivateCar;
 import com.example.tollcalculator.domain.Vehicle;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class TollCalculatorTest {
-
-  private static final double EPS = 1E-4;
   private final TollCalculator tollCalculator = new TollCalculator();
 
   @Test
