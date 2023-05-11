@@ -21,7 +21,14 @@ public class FeeServiceImpl implements FeeService {
    * A list of toll rates, where each toll rate is defined for a specific time period.
    */
   private static final List<TollRate> tollRates;
+  /**
+   * The fare rate config file in source/main/resources folder
+   */
   private static final String CONFIG_FILE_NAME = "rates.yml";
+
+  /**
+   * The jackson object for yaml mapping.
+   */
   private static final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory())
       .registerModule(new JavaTimeModule());
 
@@ -52,7 +59,7 @@ public class FeeServiceImpl implements FeeService {
     return tollRates
         .stream()
         .filter(r -> r.contains(pass))
-        .map(r -> r.getRate())
+        .map(TollRate::getRate)
         .max(Double::compare)
         .orElse(0.0);
   }

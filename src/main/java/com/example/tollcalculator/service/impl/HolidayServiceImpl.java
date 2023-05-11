@@ -1,6 +1,5 @@
 package com.example.tollcalculator.service.impl;
 
-import com.example.tollcalculator.domain.TollRate;
 import com.example.tollcalculator.service.HolidayService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,7 +8,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,8 +18,13 @@ public class HolidayServiceImpl implements HolidayService {
    * A map that contains the holidays as key-value pairs, where the key is the date and the value is the name of the holiday.
    */
   private static Map<LocalDate, String> holidays;
-
+  /**
+   * The holiday config file in source/main/resources folder
+   */
   private static final String HOLIDAYS_FILE_NAME = "holidays.yml";
+  /**
+   * The jackson object for yaml mapping.
+   */
   private static final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory())
       .registerModule(new JavaTimeModule());
 

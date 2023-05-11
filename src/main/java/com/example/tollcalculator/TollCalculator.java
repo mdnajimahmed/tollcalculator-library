@@ -26,7 +26,7 @@ public class TollCalculator {
    * @param passes  the times on which the vehicle passed through a toll station
    * @return the total toll fee for that day for the given vehicle and time of passes.
    */
-  public int getTollFee(Vehicle vehicle, Date... passes) {
+  public int getTollFee(final Vehicle vehicle, final Date... passes) {
     List<LocalDateTime> passesInLocalDateTime = convertDates(passes);
     if (!representsSameDate(passesInLocalDateTime)) {
       throw new RuntimeException("Input dates does not represent the same day pass");
