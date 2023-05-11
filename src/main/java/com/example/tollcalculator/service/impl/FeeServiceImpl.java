@@ -1,8 +1,13 @@
 package com.example.tollcalculator.service.impl;
 
+import com.example.tollcalculator.domain.TollRate;
 import com.example.tollcalculator.service.FeeService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,22 +21,24 @@ public class FeeServiceImpl implements FeeService {
    * A list of toll rates, where each toll rate is defined for a specific time period.
    */
   private static final List<TollRate> tollRates;
+  private static final String CONFIG_FILE_NAME = "rates.yml";
+  private static final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
 
   /**
    Static initialization block that initializes the tollRates list with a set of default toll rates.
    */
   static {
-    tollRates = new ArrayList<>();
-    tollRates.add(new TollRate(LocalTime.of(6, 0, 0), LocalTime.of(6, 29, 59), 8.0));
-    tollRates.add(new TollRate(LocalTime.of(6, 30, 0), LocalTime.of(6, 59, 59), 13.0));
-    tollRates.add(new TollRate(LocalTime.of(7, 0, 0), LocalTime.of(7, 59, 59), 18.0));
-    tollRates.add(new TollRate(LocalTime.of(8, 0, 0), LocalTime.of(8, 29, 59), 13.0));
-    tollRates.add(new TollRate(LocalTime.of(8, 30, 0), LocalTime.of(14, 59, 59), 8.0));
-    tollRates.add(new TollRate(LocalTime.of(15, 0, 0), LocalTime.of(15, 29, 59), 13.0));
-    tollRates.add(new TollRate(LocalTime.of(15, 30, 0), LocalTime.of(16, 59, 59), 18.0));
-    tollRates.add(new TollRate(LocalTime.of(17, 0, 0), LocalTime.of(17, 59, 59), 13.0));
-    tollRates.add(new TollRate(LocalTime.of(18, 0, 0), LocalTime.of(18, 29, 59), 8.0));
-    // add more hourlyFeeRates as needed
+    objectMapper.registerModule(new JavaTimeModule());
+    try (InputStream inputStream = FeeServiceImpl.class.getResourceAsStream(
+        "/" + CONFIG_FILE_NAME)) {
+      if (inputStream == null) {
+        throw new RuntimeException(CONFIG_FILE_NAME + " file not found in the resources directory");
+      }
+      tollRates = objectMapper.readValue(inputStream,
+          objectMapper.getTypeFactory().constructCollectionType(List.class, TollRate.class));
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to read " + CONFIG_FILE_NAME + " file", e);
+    }
   }
 
   /**
@@ -45,67 +52,10 @@ public class FeeServiceImpl implements FeeService {
     return tollRates
         .stream()
         .filter(r -> r.contains(pass))
-        .map(r -> r.fee)
+        .map(r -> r.getRate())
         .max(Double::compare)
         .orElse(0.0);
   }
 
-  /**
-   * Represents a toll rate for a specific time period, containing an hourly rate for that period.
-   */
-  static class TollRate {
-    /*
-The start time of the time period for which the toll rate applies.
-*/
-    private LocalTime hourStart;
-    /*
-     * The end time of the time period for which the toll rate applies.
-     */
 
-    private LocalTime hourEnd;
-    /**
-     * The hourly toll rate for the time period.
-     */
-    private double fee;
-
-    /**
-     * Creates a new TollRate object with the specified start and end times and hourly toll rate.
-     *
-     * @param hourStart the start time of the time period for which the toll rate applies
-     * @param hourEnd   the end time of the time period for which the toll rate applies
-     */
-    TollRate(final LocalTime hourStart, final LocalTime hourEnd, final double fee) {
-      this.hourStart = hourStart;
-      this.hourEnd = hourEnd;
-      this.fee = fee;
-    }
-
-    LocalTime getHourStart() {
-      return hourStart;
-    }
-
-    LocalTime getHourEnd() {
-      return hourEnd;
-    }
-
-    double getFee() {
-      return fee;
-    }
-
-    /**
-     * Checks whether the given time is contained within the interval of this TollRate object.
-     *
-     * @param time the LocalTime object to be checked for containment within this TollRate object's interval
-     * @return true if the given time is within the interval of this TollRate object, false otherwise
-     * @throws IllegalArgumentException if the given time is null
-     */
-
-    boolean contains(final LocalTime time) {
-      if (time == null) {
-        throw new IllegalArgumentException("Null value is not allowed");
-      }
-      return !time.isBefore(hourStart) && !time.isAfter(hourEnd);
-
-    }
-  }
 }

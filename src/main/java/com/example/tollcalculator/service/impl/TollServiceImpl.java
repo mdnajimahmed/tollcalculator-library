@@ -66,6 +66,7 @@ public class TollServiceImpl implements TollService {
    * @param passTimestamps the times of the passes.
    * @return a list of hourly windows, each containing pass times that fall within the same hour.
    */
+
   private List<List<LocalDateTime>> getHourlyWindows(final List<LocalDateTime> passTimestamps) {
     Collections.sort(passTimestamps);
     final List<List<LocalDateTime>> hourlyWindows = new ArrayList<>();

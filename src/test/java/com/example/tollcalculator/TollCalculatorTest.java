@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class TollCalculatorTest {
+
   private static final double EPS = 1E-4;
   private final TollCalculator tollCalculator = new TollCalculator();
 
