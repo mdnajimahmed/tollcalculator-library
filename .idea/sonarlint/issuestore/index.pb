@@ -38,13 +38,7 @@ t
 Dsrc/main/java/com/example/tollcalculator/service/HolidayService.java,5/e/5e3e2e6d256a510175399579b018fbad152982d0
 }
 Msrc/main/java/com/example/tollcalculator/service/impl/HolidayServiceImpl.java,a/0/a0347a9b1d3b55fa7002bcea811574d652e87d3b
-l
-<src/main/java/com/example/tollcalculator/TollCalculator.java,e/5/e51fbf9cb8b4dc7ec3b95813383c1f5eeba5e138
-p
-@src/test/java/com/example/tollcalculator/TollCalculatorTest.java,5/d/5d4ae5bd6b94d507c1d6365ff1134e8f492b2d20
 q
 Asrc/main/java/com/example/tollcalculator/service/TollService.java,a/e/aeff68286aa91925739af86eb6e9b7d72d2f86cb
-z
-Jsrc/main/java/com/example/tollcalculator/service/impl/TollServiceImpl.java,6/e/6ea00db33ce6142b2b54c1cdb7a851d79cc0cffc
 z
 Jsrc/test/java/com/example/tollcalculator/service/impl/TollServiceTest.java,d/d/dda78a62809ff670740987d4f06c5693cfd2c206

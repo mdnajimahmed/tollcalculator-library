@@ -6,6 +6,7 @@ import com.example.tollcalculator.service.impl.TollServiceImpl;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The TollCalculator class calculates toll fees for a given vehicle and a set of dates representing time of
@@ -41,7 +42,7 @@ public class TollCalculator {
     return passes.stream()
         .map(LocalDateTime::toLocalDate)
         .distinct()
-        .count() == 1;
+        .count() <= 1;
   }
 
   /**
@@ -52,7 +53,8 @@ public class TollCalculator {
    */
   private List<LocalDateTime> convertDates(Date[] dates) {
     return Arrays.stream(dates)
-        .map(date -> LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault())).toList();
+        .map(date -> LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()))
+        .collect(Collectors.toList());
   }
 }
 

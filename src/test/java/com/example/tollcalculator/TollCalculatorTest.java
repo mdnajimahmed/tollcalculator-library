@@ -19,7 +19,7 @@ class TollCalculatorTest {
   @Test
   void testTollCalculation() {
     Vehicle privateCar = new PrivateCar();
-    List<Date> passes = Arrays.asList(
+    Date[] passes = new Date[] {
         // Fee : 0 , total fee : 0
         new GregorianCalendar(2023, 9, 3, 3, 25, 0).getTime(),
 
@@ -42,8 +42,33 @@ class TollCalculatorTest {
         new GregorianCalendar(2023, 9, 3, 15, 15, 0).getTime(),
         new GregorianCalendar(2023, 9, 3, 15, 45, 0).getTime(),
         new GregorianCalendar(2023, 9, 3, 16, 15, 0).getTime()
-    );
-    final int fee = tollCalculator.getTollFee(privateCar, passes.toArray(new Date[0]));
+    };
+    final int fee = tollCalculator.getTollFee(privateCar, passes);
     Assertions.assertEquals(60, fee);
   }
+
+  @Test
+  void testTollCalculationMultipleDate() {
+    Vehicle privateCar = new PrivateCar();
+    Date[] passes = new Date[] {
+        new GregorianCalendar(2023, 9, 3, 3, 25, 0).getTime(),
+        new GregorianCalendar(2023, 9, 4, 6, 15, 0).getTime()
+    };
+    Exception exception = assertThrows(RuntimeException.class, () -> {
+      tollCalculator.getTollFee(privateCar, passes);
+    });
+    Assertions.assertNotNull(exception);
+    String expectedMessage = "Input dates does not represent the same day pass";
+    String actualMessage = exception.getMessage();
+    assertTrue(actualMessage.contains(expectedMessage));
+  }
+
+  @Test
+  void testTollCalculationMultipleEmptyPass() {
+    Vehicle privateCar = new PrivateCar();
+    Date[] passes = new Date[] {};
+    final int fee = tollCalculator.getTollFee(privateCar, passes);
+    Assertions.assertEquals(0, fee);
+  }
+
 }
