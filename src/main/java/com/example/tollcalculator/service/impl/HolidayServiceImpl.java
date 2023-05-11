@@ -1,7 +1,15 @@
 package com.example.tollcalculator.service.impl;
 
+import com.example.tollcalculator.domain.TollRate;
 import com.example.tollcalculator.service.HolidayService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,29 +19,32 @@ public class HolidayServiceImpl implements HolidayService {
   /**
    * A map that contains the holidays as key-value pairs, where the key is the date and the value is the name of the holiday.
    */
-  private final Map<LocalDate, String> holidays;
+  private static Map<LocalDate, String> holidays;
+
+  private static final String HOLIDAYS_FILE_NAME = "holidays.yml";
+  private static final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory())
+      .registerModule(new JavaTimeModule());
+
+  static {
+    try (InputStream inputStream = HolidayServiceImpl.class.getResourceAsStream(
+        "/" + HOLIDAYS_FILE_NAME)) {
+      if (inputStream == null) {
+        throw new RuntimeException(
+            HOLIDAYS_FILE_NAME + " file not found in the resources directory");
+      }
+      holidays = objectMapper.readValue(inputStream, new TypeReference<>() {
+      });
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to read " + HOLIDAYS_FILE_NAME + " file", e);
+    }
+  }
 
   /**
    * Constructs a new {@code HolidayServiceImpl} object and initializes the {@code holidays}
    * map with a set of predefined holidays.
    */
   public HolidayServiceImpl() {
-    holidays = Map.ofEntries(
-        Map.entry(LocalDate.of(2023, 1, 1), "New Year's Day"),
-        Map.entry(LocalDate.of(2023, 1, 6), "Epiphany"),
-        Map.entry(LocalDate.of(2023, 4, 14), "Good Friday"),
-        Map.entry(LocalDate.of(2023, 4, 16), "Easter Sunday"),
-        Map.entry(LocalDate.of(2023, 4, 17), "Easter Monday"),
-        Map.entry(LocalDate.of(2023, 5, 1), "May Day"),
-        Map.entry(LocalDate.of(2023, 5, 25), "Ascension Day"),
-        Map.entry(LocalDate.of(2023, 6, 4), "Whit Sunday"),
-        Map.entry(LocalDate.of(2023, 6, 6), "National Day"),
-        Map.entry(LocalDate.of(2023, 6, 9), "Whit Monday"),
-        Map.entry(LocalDate.of(2023, 12, 24), "Christmas Eve"),
-        Map.entry(LocalDate.of(2023, 12, 25), "Christmas Day"),
-        Map.entry(LocalDate.of(2023, 12, 26), "Boxing Day"),
-        Map.entry(LocalDate.of(2023, 12, 31), "New Year's Eve")
-    );
+
   }
 
   /**

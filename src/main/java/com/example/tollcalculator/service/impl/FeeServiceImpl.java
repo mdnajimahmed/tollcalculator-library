@@ -22,13 +22,13 @@ public class FeeServiceImpl implements FeeService {
    */
   private static final List<TollRate> tollRates;
   private static final String CONFIG_FILE_NAME = "rates.yml";
-  private static final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
+  private static final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory())
+      .registerModule(new JavaTimeModule());
 
   /**
    Static initialization block that initializes the tollRates list with a set of default toll rates.
    */
   static {
-    objectMapper.registerModule(new JavaTimeModule());
     try (InputStream inputStream = FeeServiceImpl.class.getResourceAsStream(
         "/" + CONFIG_FILE_NAME)) {
       if (inputStream == null) {
