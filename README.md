@@ -2,7 +2,8 @@
 https://github.com/EvolveTechnology/toll-calculator
 
 # Explanation on the approach:
-- The existing API is kept un-changes since there might be other systems depending on the original API. 
+#### API:
+The existing API is kept un-changes since there might be other systems depending on the original API. 
 ```
 /**
    * Calculate the total toll fee for one day
@@ -13,14 +14,15 @@ https://github.com/EvolveTechnology/toll-calculator
    */
   public int getTollFee(Vehicle vehicle, Date... dates) {
 ``` 
-However, here are some improvements done on the original API
+#### Improvements:
+Here are some improvements done on the original implementation - 
 - As per the documentation, the original API assumes the dates provided will be of same day however, it does not validate that or throws any error if otherwise. This solution implements that validation and returns and error if the dates are not of the same day.
 - This solution internally uses the new Java 8 date APIs instead of using java.util.Date which makes the solution robust and easy to maintain in future since many java.util.Date related APIs are deprecated or on the way to phase out.
 - Unlike the original solution, the core business logics are segregated into three services
   - FeeService - Responsible for fee related logics. It has one a public method `getTollRate` that returns amount of toll be paid based on the time of the day. The implementation details and internal representation of toll rate is hidden from the client following OOP encapsulation principle. 
   - HolidayService - Responsible to manage holidays. It has one public method `isHoliday` that takes an instance of localdate and returns true if the day is a holiday. The implementation details and internal representation of holiday calendar is hidden from the client following OOP encapsulation principle.
   - TollService - With the help of FeeService and HolidayService it calculates toll for the given vehicle and passes.
-- Toll Calculation logic:
+#### Toll Calculation logic:
   - At first, we check do we have to pay any toll at all based on vehicle type and date. We have a abstract base class `Vehicle` which has a method `isTollFree()`, all the logic is written on abstraction(Vehicle) following OOP best practice. The concrete implementations of vehicle provide implementation for  `isTollFree()` denoting if the vehicle should pay toll based on it's concrete type. In this way we eliminated the enum of tollable vehicles which makes the code more maintainable in future following `Open-Close` principle.
   - After that we group those vehicles together that falls under same hour period. We sort the dates and run a sliding window algorithm to do it in O(nlog(n)) complexity. In this way, we fix the hourly calculation bug in the existing code that only compares with the first vehicle's pass time while doing hourly grouping. 
   - Then for each hour group, we take the maximum payable amount among all the passes within that group and add that amount with our final result.Since, we are only taking the max for each hour period, it also ensures that the vehicle pays only once within an hour window. 
